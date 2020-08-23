@@ -41,14 +41,14 @@ namespace JsonParser
                     case ']': result.Add(new JsonToken("]", JsonTokenType.END_ARRAY)); --ARR_SIGN; break;
                     case ',': 
                         result.Add(new JsonToken(",", JsonTokenType.COLON));
-                        if (i == 0 || i == str.Length - 1 || str[i + 1] == '}' || str[i + 1] == ']') 
-                            throw new FormatException("字符串格式不正确。");
+                        if (i == 0 || i == str.Length - 1 || str[i + 1] == '}' || str[i + 1] == ']')
+                            throw new FormatException("The string format is incorrect.");
                         break;
                     case ':': 
                         result.Add(new JsonToken(":", JsonTokenType.COMMA));
                         if (i == str.Length - 1 || str[i + 1] == '}' || str[i + 1] == ']' || str[i - 1] == '{' || str[i - 1] == '[') 
                         {
-                            throw new FormatException("字符串格式不正确。");
+                            throw new FormatException("The string format is incorrect.");
                         }
                         break;
                     case '"':
@@ -58,7 +58,7 @@ namespace JsonParser
                             for (i += 1; true; ++i)
                             {
                                 if(i >= str.Length)
-                                    throw new FormatException("字符串格式不正确。");
+                                    throw new FormatException("The string format is incorrect.");
                                 if (str[i] == '\\')
                                 {
                                     IsEscape = !IsEscape;
@@ -100,7 +100,7 @@ namespace JsonParser
                             {
                                 type = JsonTokenType.NUMBER;
                                 if (!double.TryParse(output, out _))
-                                    throw new FormatException("字符串格式不正确。");
+                                    throw new FormatException("The string format is incorrect.");
                             }
                             result.Add(new JsonToken(output, type));
                             if (i < str.Length) --i;
@@ -109,7 +109,7 @@ namespace JsonParser
                 }
             }
             if (OBJ_SIGN != 0 || ARR_SIGN != 0) 
-                throw new FormatException("字符串格式不正确。");
+                throw new FormatException("The string format is incorrect.");
             result.Add(new JsonToken(null, JsonTokenType.END_DOCUMENT));
             return result;
         }
@@ -133,7 +133,7 @@ namespace JsonParser
             }
             return result;
         }
-        private static void indent(ref string str, int depth)
+        private static void Indent(ref string str, int depth)
         {
             for (int i = 0; i < depth; ++i)
                 str += "    ";
@@ -150,37 +150,37 @@ namespace JsonParser
                         if (i > 1 && this[i - 1].Type == JsonTokenType.COMMA) 
                         {
                             result += '\n';
-                            indent(ref result, depth);
+                            Indent(ref result, depth);
                         }
                         ++depth;
                         result += "[ \n";
-                        indent(ref result, depth);
+                        Indent(ref result, depth);
                         break;
                     case JsonTokenType.END_ARRAY:
                         --depth;
                         result += '\n';
-                        indent(ref result, depth);
+                        Indent(ref result, depth);
                         result += "]";
                         break;
                     case JsonTokenType.START_OBJECT:
                         if (i > 1 && this[i - 1].Type == JsonTokenType.COMMA)
                         {
                             result += '\n';
-                            indent(ref result, depth);
+                            Indent(ref result, depth);
                         }
                         ++depth;
                         result += "{ \n";
-                        indent(ref result, depth);
+                        Indent(ref result, depth);
                         break;
                     case JsonTokenType.END_OBJECT:
                         --depth;
                         result += '\n';
-                        indent(ref result, depth);
+                        Indent(ref result, depth);
                         result += "}";
                         break;
                     case JsonTokenType.COLON:
                         result += " , \n";
-                        indent(ref result, depth);
+                        Indent(ref result, depth);
                         break;
                     case JsonTokenType.COMMA:
                         result += " : ";
@@ -201,6 +201,19 @@ namespace JsonParser
     {
         public String Name { get; set; }
         public JsonValue Value { get; set; }
+        public Object this[int index]
+        {
+            get 
+            { 
+                if (index == 0) return Name;
+                else return Value;
+            }
+            set 
+            {
+                if (index == 0) Name = (String)value;
+                else Value = (JsonValue)value; 
+            }
+        }
         public JsonObjectItem() { }
         public JsonObjectItem(String Name, JsonValue Value)
         {
